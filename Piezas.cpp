@@ -24,7 +24,7 @@ Piezas::Piezas()
 {
 	for(int i = 0; i < BOARD_COLS; i++)
 	{
-		vector<Piece> aBoard;
+		std::vector<Piece> aBoard;
 		for(int j = 0; j < BOARD_ROWS; j++)
 		{
 			Piece p = Blank; 
@@ -49,7 +49,7 @@ void Piezas::reset()
 
 	for(int i = 0; i < BOARD_COLS; i++)
 	{
-		vector<Piece> aBoard;
+		std::vector<Piece> aBoard;
 		for(int j = 0; j < BOARD_ROWS; j++)
 		{
 			Piece p = Blank; 
@@ -71,25 +71,26 @@ void Piezas::reset()
 Piece Piezas::dropPiece(int column)
 {
 	Piece currentTurn = turn;
-	vector<Piece>toBeSwapped;
-	vector<Piece>tmp;
+	std::vector<Piece> toBeSwapped;
+	std::vector<Piece> tmp;
 	tmp = board[column-1];
-	int numOfBlanks = 0;
-	Piece p = tmp.pop_back();
+	Piece p = tmp.back();
+	tmp.pop_back();
 	while(p != Blank)
 	{
 		toBeSwapped.push_back(p);	
-		p = tmp.pop_back();
+		p = tmp.back();
+		tmp.pop_back();
 	}
-	if(toBeSwapped.size == 4)
+	if(toBeSwapped.size() == 4)
 	{
 			return Blank;
 	}
 
 	toBeSwapped.push_back(turn);
-	while(toBeSwapped.size != 4)
+	while(toBeSwapped.size() != 4)
 	{
-		toBeSwapped.push_back(Empty); 
+		toBeSwapped.push_back(Blank); 
 	}
 	board[column-1].swap(toBeSwapped);
 	if(turn == X)
@@ -126,4 +127,66 @@ Piece Piezas::pieceAt(int row, int column)
  * or horizontally. If both X's and O's have the same max number of pieces in a
  * line, it is a tie.
 **/
-Piece Piezas::gameState();
+Piece Piezas::gameState()
+{
+	int oScore = 0; 
+	int xScore = 0;
+	int xFlag = 5;
+	int oFlag = 5;
+	for(int i = 0; i < BOARD_COLS; i++) 
+	{
+		for(int j = 0; j < BOARD_ROWS; j++) 
+		{
+			if(board[i][j] == X)
+			{
+				if((j == xFlag)	|| (j == xFlag + 1) || (j == xFlag - 1))
+				{
+					xScore +=1; 
+				}	
+				xFlag = j; 
+			}		
+			else if(board[i][j] == O)
+			{
+				if((j == oFlag)	|| (j == oFlag + 1) || (j == oFlag - 1))
+				{
+					oScore +=1; 
+				}	
+				oFlag = j; 
+
+			}
+		}
+	}
+
+	if(checkProgress())
+	{
+		if(oScore < xScore)
+		{
+			return X;
+		}
+		else if(oScore > xScore)
+		{
+			return O;
+		}
+		else if(oScore == xScore)
+		{
+			return Blank;
+		}
+	}
+
+	return Invalid;
+}
+
+bool Piezas::checkProgress()
+{
+	for(int i = 0; i < BOARD_COLS; i++) 
+	{
+		for(int j = 0; j < BOARD_ROWS; j++)
+		{
+			if(board[i][j] == Blank)
+			{
+				return false;
+			}
+		}
+	}
+	return true; 
+}	

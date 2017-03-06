@@ -30,6 +30,7 @@ enum Piece
 class Piezas
 {
   private:
+		bool checkProgress(); 
   	std::vector < std::vector<Piece> > board;
   	Piece turn;
 
